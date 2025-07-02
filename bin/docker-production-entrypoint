@@ -1,0 +1,16 @@
+#!/bin/bash
+set -e
+
+# Check if the database exists and is set up before creating it
+if [ "${*}" == "./bin/rails server" ]; then
+  if ! ./bin/rails db:version > /dev/null 2>&1; then
+    echo "Database does not exist or is not set up. Creating and preparing..."
+    ./bin/rails db:create
+    ./bin/rails db:prepare
+  else
+    echo "Database already exists. Skipping creation."
+  fi
+fi
+
+# Continue with the normal command
+exec "${@}"

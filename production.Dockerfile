@@ -3,7 +3,7 @@ ARG RUBY_VERSION=3.4.2
 FROM docker.io/library/ruby:$RUBY_VERSION-slim
 
 # Rails app lives here
-WORKDIR /app
+WORKDIR /rails
 
 # Install system dependencies
 RUN apt-get update -qq && \
@@ -28,35 +28,29 @@ RUN apt-get update -qq && \
     rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
     
 
-# Set development environment
-ENV RAILS_ENV=development \
-    BUNDLE_WITHOUT="" \
-    PATH="${PATH}:/app/bin"
+# Set production environment
+ENV RAILS_LOG_TO_STDOUT="1"\
+    RAILS_SERVE_STATIC_FILES="true" \
+    RAILS_ENV="production" \
+    BUNDLE_WITHOUT="development" 
 
 # Install gems
 COPY Gemfile Gemfile.lock ./
 RUN bundle install
 
 # Copy application code
-COPY bin/docker-dev-entrypoint /app/bin/
-RUN chmod +x /app/bin/docker-dev-entrypoint
+COPY . . 
+
+RUN bundle exec bootsnap precompile --gemfile app/ lib/
+
+RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile 
 
 
-# Create required directories
-RUN mkdir -p tmp/pids db log storage
-
-# Create non-root user and change ownership
-RUN groupadd --gid 1000 rails && \
-    useradd --uid 1000 --gid rails --shell /bin/bash --create-home rails && \
-    chown -R rails:rails /app
-
-# Switch to non-root user
-USER rails
 
 # No COPY of application code here! It will come from the volume mount
 
-ENTRYPOINT ["docker-dev-entrypoint"]
+ENTRYPOINT ["/rails/bin/docker-production-entrypoint"]
 
 # Start server
 EXPOSE 3000
-CMD ["./bin/rails", "server", "-b", "0.0.0.0"]
+CMD ["./bin/rails", "server"]
