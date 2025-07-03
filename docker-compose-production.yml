@@ -13,7 +13,7 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "PGPASSWORD=${ENV_POSTGRES_PASSWORD} pg_isready -U ${ENV_POSTGRES_USER} && PGPASSWORD=${ENV_POSTGRES_PASSWORD} psql -U ${ENV_POSTGRES_USER} -d ${ENV_POSTGRES_DB} -c 'SELECT 1'"]  # Checks if Postgres is ready
+      test: ["CMD-SHELL", "pg_isready -h ${ENV_POSTGRES_HOST} -U ${ENV_POSTGRES_USER} -d ${ENV_POSTGRES_DB}"]  # Checks if Postgres is ready
       interval: 5s                 # Check every 5 seconds
       timeout: 5s                  # Timeout after 5 seconds
       retries: 10                  # Retry up to 10 times
