@@ -1,13 +1,25 @@
-#!/bin/bash -e
+#!/bin/bash
+set -e
 
-# Enable jemalloc for reduced memory usage and latency.
-if [ -z "${LD_PRELOAD+x}" ] && [ -f /usr/lib/*/libjemalloc.so.2 ]; then
-  export LD_PRELOAD="$(echo /usr/lib/*/libjemalloc.so.2)"
-fi
-
-# If running the rails server then create or migrate existing database
-if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
-  ./bin/rails db:prepare
-fi
-
-exec "${@}"
+# Check if command is rails server (with any arguments)
+echo "docker-development-entrypoint is running."
+sleep 10;
+echo "Waiting for Postgres to be ready…";
+until pg_isready -h $POSTGRES_HOST -U $POSTGRES_USER; do
+    echo "Postgres is unavailable - sleeping";
+    echo "pg_isready exit code: $?"
+    sleep 10;
+done;
+echo 'Postgres is up — starting Rails';
+        
+#if [ "$1" == "./bin/rails" ] && [ "$2" == "server" ]; then
+  #if ! ./bin/rails db:version RAILS_ENV="development" > /dev/null 2>&1; then
+   # echo "Database does not exist or is not set up. Creating anddd preparing..."
+    #./bin/rails db:create RAILS_ENV="development"
+    ./bin/rails db:prepare RAILS_ENV=development
+  #else
+   # echo "Database for development already exists. Skipping creation."
+  #fi
+#fi
+echo "docker-development-entrypoint is still running."
+exec "$@"

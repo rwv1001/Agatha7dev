@@ -6,10 +6,11 @@ services:
     depends_on:
       - db
     environment:
-      - DATABASE_HOST=db
-      - DATABASE_USER=robert
-      - DATABASE_PASSWORD=1
-      - DATABASE_NAME=myAgathaApp_development
+      - RAILS_ENV=development
+      - POSTGRES_HOST=${ENV_POSTGRES_HOST}
+      - POSTGRES_DB=${ENV_POSTGRES_DEV_DB}
+      - POSTGRES_USER=${ENV_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${ENV_POSTGRES_PASSWORD}  
     ports:
       - "3000:3000"
     volumes:
@@ -20,9 +21,9 @@ services:
   db:
     image: postgres:15
     environment:
-      - POSTGRES_USER=robert
-      - POSTGRES_PASSWORD=1
-      - POSTGRES_DB=myAgathaApp_development
+      - POSTGRES_DB=${ENV_POSTGRES_DEV_DB}
+      - POSTGRES_USER=${ENV_POSTGRES_USER}
+      - POSTGRES_PASSWORD=${ENV_POSTGRES_PASSWORD}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:

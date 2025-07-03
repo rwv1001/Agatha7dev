@@ -49,8 +49,8 @@ RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
 
 # No COPY of application code here! It will come from the volume mount
 
-ENTRYPOINT ["/rails/bin/docker-production-entrypoint"]
+ENTRYPOINT ["./bin/docker-production-entrypoint"]
 
 # Start server
 EXPOSE 3000
-CMD ["./bin/rails", "server"]
+CMD ["./bin/rails", "server", "-b", "0.0.0.0"]

@@ -9,13 +9,6 @@ WORKDIR /app
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
     build-essential \
-    bash \
-    bash-completion \
-    libffi-dev \
-    tzdata \
-    nodejs \
-    npm \
-    yarn \    
     curl \
     git \
     libjemalloc2 \
@@ -24,13 +17,10 @@ RUN apt-get update -qq && \
     pkg-config \
     postgresql-client \
     libyaml-dev && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /usr/share/doc /usr/share/man
-    
+    rm -rf /var/lib/apt/lists/*
 
 # Set development environment
-ENV RAILS_ENV=development \
-    BUNDLE_WITHOUT="" \
+ENV BUNDLE_WITHOUT="" \
     PATH="${PATH}:/app/bin"
 
 # Install gems
